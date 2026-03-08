@@ -32,7 +32,7 @@ app.get('/ad.js', (req, res) => {
   res.setHeader('Cache-Control', 'no-cache');
   
   // Send the ad script with the siteId embedded
-  res.send(`
+  const scriptContent = `
     (function() {
       const siteId = "${siteId}";
       const adServerUrl = "${req.protocol}://${req.get('host')}";
@@ -53,7 +53,7 @@ app.get('/ad.js', (req, res) => {
       
       if (!adShown && !adClosed) {
         // Fetch ad HTML from server
-        fetch(\`\${adServerUrl}/api/ad-content?siteId=\${siteId}\`)
+        fetch(adServerUrl + '/api/ad-content?siteId=' + siteId)
           .then(response => response.text())
           .then(html => {
             container.innerHTML = html;
@@ -63,10 +63,10 @@ app.get('/ad.js', (req, res) => {
             sessionStorage.setItem('faida_ad_shown', 'true');
             
             // Track impression
-            fetch(\`\${adServerUrl}/api/track-impression\`, {
+            fetch(adServerUrl + '/api/track-impression', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ siteId, userId: getUserId() })
+              body: JSON.stringify({ siteId: siteId, userId: getUserId() })
             });
             
             // Setup close button
@@ -82,10 +82,10 @@ app.get('/ad.js', (req, res) => {
             const adLinks = container.querySelectorAll('a');
             adLinks.forEach(link => {
               link.addEventListener('click', function(e) {
-                fetch(\`\${adServerUrl}/api/track-click\`, {
+                fetch(adServerUrl + '/api/track-click', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ siteId, userId: getUserId() })
+                  body: JSON.stringify({ siteId: siteId, userId: getUserId() })
                 });
               });
             });
@@ -103,7 +103,9 @@ app.get('/ad.js', (req, res) => {
         return userId;
       }
     })();
-  `);
+  `;
+  
+  res.send(scriptContent);
 });
 
 // Endpoint to serve ad HTML content
@@ -111,7 +113,7 @@ app.get('/api/ad-content', (req, res) => {
   const siteId = req.query.siteId;
   
   // You could customize ad content based on siteId
-  const adHtml = \`
+  const adHtml = `
     <div class="banner-ad ad-format" style="
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       border-radius: 12px;
@@ -166,7 +168,7 @@ app.get('/api/ad-content', (req, res) => {
         <span>Sponsored Content</span>
       </div>
     </div>
-  \`;
+  `;
   
   res.send(adHtml);
 });
