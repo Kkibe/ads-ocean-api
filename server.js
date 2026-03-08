@@ -23,56 +23,121 @@ app.post('/api/track-click', express.json(), (req, res) => {
   res.json({ success: true });
 });
 
-// Add this endpoint to your server.js file
+// Endpoint to serve ad HTML content
 app.get('/api/ad-content', (req, res) => {
   const siteId = req.query.siteId;
   
+  // Using your exact UI styles
   const adHtml = `
-    <div class="banner-ad ad-format" style="
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 12px;
-      padding: 20px;
-      color: white;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      max-width: 100%;
-      margin: 10px 0;
-      position: relative;
-      font-family: inherit;
-    ">
-      <div class="ad-close" style="
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        cursor: pointer;
-        font-size: 20px;
-        font-weight: bold;
-        color: white;
-        opacity: 0.8;
-        z-index: 1;
-      ">×</div>
-      <div class="banner-content" style="text-align: center;">
-        <h3 style="margin: 0 0 10px 0; font-size: 18px;">Get Instant Loan To Mpesa</h3>
-        <p style="margin: 0 0 15px 0; opacity: 0.9;">Special Offer Just For You.</p>
-        <a href="https://faidafunds.onrender.com/" 
-           target="_blank"
-           style="
-             display: inline-block;
-             background: white;
-             color: #667eea;
-             padding: 10px 25px;
-             border-radius: 25px;
-             text-decoration: none;
-             font-weight: bold;
-           "
-        >Apply Now</a>
+    <style>
+      /* Ad format common styles */
+      .ad-format {
+          border-radius: 8px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+          display: flex;
+          flex-direction: column;
+          text-align: center;
+          padding: .5rem;
+          position: fixed;
+          bottom: 20px;
+          right: 20px;
+          max-width: 300px;
+          font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+          background: white;
+      }
+
+      .ad-format:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+      }
+
+      .ad-footer {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: .5rem;
+          padding-top: 0.5rem;
+          border-top: 1px solid #f1f5f9;
+          font-size: 0.5rem;
+          color: #94a3b8;
+      }
+
+      .banner-content {
+          background: linear-gradient(to right, #4f46e5, #7c3aed);
+          color: white;
+          border-radius: 6px;
+          padding: 1.5rem;
+      }
+
+      .banner-ad h3 {
+          font-size: 1.25rem;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+      }
+
+      .banner-ad p {
+          font-size: 0.85rem;
+          margin-bottom: 1rem;
+          opacity: 0.9;
+      }
+
+      .ad-btn {
+          display: inline-block;
+          background: white;
+          color: #4f46e5;
+          text-decoration: none;
+          padding: 0.5rem 1.25rem;
+          border-radius: 4px;
+          font-size: 0.8rem;
+          font-weight: 500;
+          transition: all 0.2s ease;
+      }
+
+      .ad-btn:hover {
+          background: #f8fafc;
+          transform: translateY(-1px);
+      }
+
+      .ad-close {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          width: 24px;
+          height: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(0, 0, 0, 0.5);
+          color: white;
+          border-radius: 50%;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          z-index: 10;
+          line-height: 1;
+          backdrop-filter: blur(2px);
+      }
+
+      .ad-close:hover {
+          background: rgba(0, 0, 0, 0.7);
+          transform: scale(1.1);
+      }
+
+      .ad-close:active {
+          transform: scale(0.95);
+      }
+    </style>
+
+    <div class="banner-ad ad-format">
+      <div class="ad-close">x</div>
+      <div class="banner-content">
+        <h3>Get Instant Loan To Mpesa</h3>
+        <p>Special Offer Just For You.</p>
+        <a href="https://faidafunds.onrender.com/" class="ad-btn" target="_blank">Apply Now</a>
       </div>
-      <div class="ad-footer" style="
-        margin-top: 15px;
-        font-size: 12px;
-        opacity: 0.7;
-        display: flex;
-        justify-content: space-between;
-      ">
+      <div class="ad-footer">
         <span>Ad • Faida Funds</span>
         <span>Sponsored Content</span>
       </div>
@@ -99,12 +164,6 @@ app.get('/ad.js', (req, res) => {
       // Create ad container
       const container = document.createElement('div');
       container.id = 'faida-funds-ad';
-      container.style.cssText = \`
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        margin: 10px 0;
-        padding: 0;
-        box-sizing: border-box;
-      \`;
       
       // Check if ad was shown in this session
       const adShown = sessionStorage.getItem('faida_ad_shown');
@@ -165,71 +224,6 @@ app.get('/ad.js', (req, res) => {
   `;
   
   res.send(scriptContent);
-});
-
-// Endpoint to serve ad HTML content
-app.get('/api/ad-content', (req, res) => {
-  const siteId = req.query.siteId;
-  
-  // You could customize ad content based on siteId
-  const adHtml = `
-    <div class="banner-ad ad-format" style="
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 12px;
-      padding: 20px;
-      color: white;
-      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      max-width: 100%;
-      margin: 10px 0;
-      position: relative;
-      font-family: inherit;
-    ">
-      <div class="ad-close" style="
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        cursor: pointer;
-        font-size: 20px;
-        font-weight: bold;
-        color: white;
-        opacity: 0.8;
-        transition: opacity 0.3s;
-        z-index: 1;
-      ">×</div>
-      <div class="banner-content" style="text-align: center;">
-        <h3 style="margin: 0 0 10px 0; font-size: 18px;">Get Instant Loan To Mpesa</h3>
-        <p style="margin: 0 0 15px 0; opacity: 0.9;">Special Offer Just For You.</p>
-        <a href="https://faidafunds.onrender.com/" 
-           class="ad-btn" 
-           target="_blank"
-           style="
-             display: inline-block;
-             background: white;
-             color: #667eea;
-             padding: 10px 25px;
-             border-radius: 25px;
-             text-decoration: none;
-             font-weight: bold;
-             transition: transform 0.3s;
-           "
-           onmouseover="this.style.transform='scale(1.05)'"
-           onmouseout="this.style.transform='scale(1)'"
-        >Apply Now</a>
-      </div>
-      <div class="ad-footer" style="
-        margin-top: 15px;
-        font-size: 12px;
-        opacity: 0.7;
-        display: flex;
-        justify-content: space-between;
-      ">
-        <span>Ad • Faida Funds</span>
-        <span>Sponsored Content</span>
-      </div>
-    </div>
-  `;
-  
-  res.send(adHtml);
 });
 
 app.listen(PORT, () => {
